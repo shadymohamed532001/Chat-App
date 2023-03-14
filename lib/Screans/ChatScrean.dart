@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:scholor_chat/Widget/CustomAppBar.dart';
 import 'package:scholor_chat/Widget/CustomMassageChat.dart';
+import 'package:scholor_chat/Widget/CustomMassageFrinedChat.dart';
 import 'package:scholor_chat/constans.dart';
 import 'package:scholor_chat/models/MassageModeal.dart';
 
@@ -15,8 +16,9 @@ class ChatScrean extends StatelessWidget {
    final FocusNode focusNode = FocusNode();
    @override
   Widget build(BuildContext context) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: Massages.orderBy(KDate).snapshots(),
+    var email = ModalRoute.of(context)!.settings.arguments;
+     return StreamBuilder<QuerySnapshot>(
+      stream: Massages.orderBy(KDate,descending: true).snapshots(),
       builder: (context,snapshot)
       {
         if(snapshot.hasData)
@@ -31,16 +33,18 @@ class ChatScrean extends StatelessWidget {
               appBar: const ChatAppBar(
                 name: 'shady steha',
                 Status: 'Online',
+
               ),
               body: Column(
                 children: [
                   Expanded(
                     child: ListView.builder(
+                      reverse: true,
                       controller: Controller,
                       itemBuilder: (context, index) {
-                        return CustomMassageChat(
+                        return MassageList[index].Id == email ? CustomMassageChat(
                           massage: MassageList[index],
-                        );
+                        ):CustomMassageFrinedChat(massage: MassageList[index]);
                       },
                       itemCount: MassageList.length,
                     ),
@@ -54,11 +58,12 @@ class ChatScrean extends StatelessWidget {
                         Massages.add(
                             {
                               Kmassage: massage,
-                              KDate: DateTime.now()
+                              KDate: DateTime.now(),
+                              'id': email,
                             }
                         );
                         Controller.animateTo(
-                          Controller.position.maxScrollExtent,
+                          Controller.position.minScrollExtent,
                             duration: Duration(milliseconds: 500),
                             curve: Curves.fastOutSlowIn
                         );
@@ -96,7 +101,7 @@ class ChatScrean extends StatelessWidget {
             );
           }else
             {
-              return Scaffold(
+              return const Scaffold(
                 body: Center(
                   child: Text(
                     'Loading ......',

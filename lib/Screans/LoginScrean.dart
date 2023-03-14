@@ -128,7 +128,7 @@ class _LoginScreanState extends State<LoginScrean> {
                             setState(() {});
                             try {
                               await LoginUsers();
-                              Navigator.pushNamed(context, KChatScrean);
+                              Navigator.pushNamed(context, KChatScrean,arguments: email);
                               emailController.clear();
                               passwordController.clear();
                             } on FirebaseAuthException catch (e) {
